@@ -1,0 +1,27 @@
+import cv2
+import numpy as np
+from time import sleep
+
+faceCascade=cv2.CascadeClassifier('/opt/anaconda3/lib/python3.8/site-packages/cv2/data/haarcascade_frontalface_default.xml')
+smileCascade=cv2.CascadeClassifier('/opt/anaconda3/lib/python3.8/site-packages/cv2/data/haarcascade_smile.xml')
+cap=cv2.VideoCapture(0)
+cap.set(3, 640)     #height of the image
+cap.set(4,480)      #width of the image
+cap.set(10,100)     # brightness
+
+while True:
+    success,img=cap.read()
+    faces=faceCascade.detectMultiScale(img,1.1,4)
+    for (x,y,w,h) in faces:
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+        face=img[y:y+h,x:x+w]
+        smiles=smileCascade.detectMultiScale(face,1.7,20)
+        for (s_x,s_y,s_w,s_h) in smiles:
+            if s_w*s_y>30000:
+                cv2.putText(face,'Smile:'+str(s_w*s_h),(s_x+(s_w//2)-10,s_y+(s_h//2)-10),cv2.FONT_HERSHEY_COMPLEX,1,(0,150,0),3)
+                cv2.rectangle(face,(s_x,s_y),(s_x+s_w,s_y+s_h),(255,255,0),2)
+
+    cv2.imshow('Video',img)
+
+    if cv2.waitKey(2) & 0xFF==ord('q'):
+        break
